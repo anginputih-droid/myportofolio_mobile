@@ -1,5 +1,5 @@
 import 'package:material_ui/material_ui.dart';
-// TODO: Import the drawer created earlier
+import 'package:myportofolio_mobile/widgets/left_drawer.dart';
 
 class ProjectFormPage extends StatefulWidget {
   const ProjectFormPage({super.key});
@@ -36,7 +36,7 @@ class _ProjectFormPageState extends State<ProjectFormPage> {
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
-      // TODO: Add the drawer we created earlier
+      drawer: const LeftDrawer(),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -174,6 +174,18 @@ class _ProjectFormPageState extends State<ProjectFormPage> {
                           builder: (context) {
                             return AlertDialog(
                               title: const Text('Project added successfully!'),
+                              content: SingleChildScrollView(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Project Name: $_projectName'),
+                                    Text('Description: $_description'),
+                                    Text('Category: $_category'),
+                                    Text('Technologies: $_technologies'),
+                                    Text('Link: $_projectLink'),
+                                  ],
+                                ),
+                              ),
                               actions: [
                                 TextButton(
                                   child: const Text('OK'),
