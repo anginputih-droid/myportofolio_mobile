@@ -14,7 +14,8 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
 
   String _experienceTitle = "";
   String _description = "";
-    String _category = "Full-Time"; // same default as the Django model
+  String _category = "Full-Time"; // same default as the Django model
+  String _thumbnail = "";
 
   // Same choices as EXPERIENCE_CHOICES in the Django Experience model.
   final List<String> _categories = [
@@ -126,7 +127,41 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
                 ),
               ),
 
-              // (thumbnail field goes here)
+              // === Thumbnail URL (optional) ===
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  keyboardType: TextInputType.url,
+                  decoration: InputDecoration(
+                    hintText: "https://...",
+                    labelText: "Thumbnail URL (optional)",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                  ),
+                  onChanged: (String? value) {
+                    setState(() {
+                      _thumbnail = value!;
+                    });
+                  },
+                  validator: (String? value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return null; // optional, like blank=True in Django
+                    }
+                    final uri = Uri.tryParse(value.trim());
+                    final isValid = uri != null &&
+                        (uri.scheme == 'http' || uri.scheme == 'https') &&
+                        uri.host.isNotEmpty;
+                    if (!isValid) {
+                      return "Enter a valid URL that starts with http:// or https://.";
+                    }
+                    return null;
+                  },
+                ),
+              ),
+
+              // (date fields go here)
+              
               // === Save Button ===
               Align(
                 alignment: Alignment.bottomCenter,
@@ -152,7 +187,10 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
                                     Text('Title: ${_experienceTitle.trim()}'),
                                     Text('Description: ${_description.trim()}'),
                                     Text('Category: $_category'),
-                                    // (more lines get added)
+                                    Text(
+                                      'Thumbnail: ${_thumbnail.trim().isEmpty ? "-" : _thumbnail.trim()}',
+                                    ),
+                                    // (date lines get added)
                                   ],
                                 ),
                               ),
