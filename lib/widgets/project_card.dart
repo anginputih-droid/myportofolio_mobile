@@ -18,7 +18,7 @@ class ItemCard extends StatelessWidget {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
-              SnackBar(content: Text("You pressed the ${item.name} button!"))
+              SnackBar(content: Text("You pressed the ${item.name} button!"), backgroundColor: item.color)
             );
           
           // Navigate to the appropriate screen
