@@ -42,9 +42,9 @@ class MyHomePage extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  InfoCard(title: 'NPM', content: npm),
-                  InfoCard(title: 'Name', content: nama),
-                  InfoCard(title: 'Class', content: kelas),
+                  Expanded(child: InfoCard(title: 'NPM', content: npm)),
+                  Expanded(child: InfoCard(title: 'Name', content: nama)),
+                  Expanded(child: InfoCard(title: 'Class', content: kelas)),
                 ],
               ),
 
@@ -100,7 +100,6 @@ class InfoCard extends StatelessWidget {
     return Card(
       elevation: 2.0,
       child: Container(
-        width: MediaQuery.of(context).size.width / 3.5,
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
