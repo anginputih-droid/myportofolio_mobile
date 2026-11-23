@@ -14,6 +14,17 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
 
   String _experienceTitle = "";
   String _description = "";
+    String _category = "Full-Time"; // same default as the Django model
+
+  // Same choices as EXPERIENCE_CHOICES in the Django Experience model.
+  final List<String> _categories = [
+    'Internship',
+    'Research',
+    'Volunteer',
+    'Part-Time',
+    'Full-Time',
+    'Freelance',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -90,8 +101,32 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
                 ),
               ),
 
-              // (category and thumbnail fields go here)
+              // === Category ===
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                    labelText: "Category",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                  ),
+                  initialValue: _category,
+                  items: _categories
+                      .map((category) => DropdownMenuItem(
+                            value: category,
+                            child: Text(category),
+                          ))
+                      .toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _category = newValue!;
+                    });
+                  },
+                ),
+              ),
 
+              // (thumbnail field goes here)
               // === Save Button ===
               Align(
                 alignment: Alignment.bottomCenter,
@@ -116,7 +151,8 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
                                   children: [
                                     Text('Title: ${_experienceTitle.trim()}'),
                                     Text('Description: ${_description.trim()}'),
-                                    // (more lines get added in category to date pickers)
+                                    Text('Category: $_category'),
+                                    // (more lines get added)
                                   ],
                                 ),
                               ),
