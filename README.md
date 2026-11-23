@@ -22,6 +22,9 @@ To check the code, run `flutter analyze`.
 - **Tutorial 08:** set up Flutter, split `menu.dart` from `main.dart`, changed `MyHomePage` to a StatelessWidget, made `InfoCard` and `ItemCard`.
 - **Assignment 7:** put my own data in the info cards, changed the buttons to match my portfolio (View Projects, View Experience, Add Project, Logout), gave each button its own color, and made the home page scrollable because the cards overflowed on a wide screen.
 
+- **Tutorial 09:** added the drawer (Home and Add Project), the Add Project form with validation and a dialog, and moved the files into `screens/` and `widgets/`.
+- **Assignment 8:** added an Add Experience form (title, description, category, thumbnail URL, start and end date) with validation, an Add Experience button on the home page and in the drawer, and a dialog that shows what was entered. Also fixed overflow on narrow screens (info cards, menu buttons, drawer header, dropdowns).
+
 ### Assignment 7
 
 **1. Explain what a widget tree is in Flutter and how parent-child relationships work between widgets.**
@@ -63,3 +66,24 @@ Hot reload (`r`) puts the code changes into the app that's already running, and 
 - **Prompt Strategy:** : I asked Claude theory questions while working on the tutorial, like the difference between StatelessWidget and StatefulWidget, what BuildContext is, why MaterialApp is the root widget, hot reload vs hot restart, why my page showed overflow stripes, and what the `..` cascade in the SnackBar code means. I used the answers to understand the code and wrote my README answers in my own words. I also got some step-by-step guidance on the Assignment 7 changes and a few terminal/git errors, but I typed and committed all the code myself.
 - **Limitations & Manual Fixes:** The answers were general, so I had to connect them to my own code myself (for example, where Theme.of(context) and `MediaQuery.of(context)` are used in `menu.dart`). I chose my own button colors and tested everything in Chrome and with `flutter analyze` myself, since the AI couldn’t run my app.
 - **AI Chat Log:** https://claude.ai/share/c1a956ba-4c63-404d-a2f5-6f35b0b7f6f1
+
+
+### Assignment 8
+
+**1. Explain the differences between `Navigator.push()`, `Navigator.pushReplacement()`, and `Navigator.pop()`. Which method opens the form from the action card? Explain how the Home option in the drawer takes the user back to the home screen.**
+Flutter keeps pages in a stack. `push()` puts a new page on top, and the old page stays underneath, so the back button still works. `pushReplacement()` swaps the current page for a new one, so you can't go back to the page that was replaced. `pop()` removes the top page (or a dialog) and shows whatever is under it. The Add Experience card on the home page uses `push()`, so pressing back on the form returns to the home page. The Home option in the drawer uses `pushReplacement()` with `MyHomePage`, so the form gets replaced by the home page. I also use `pop()` in the OK button of the dialog to close it and go back to the form.
+
+**2. How does the arrangement of `Scaffold`, `AppBar`, and `Drawer` keep the page structure consistent? Give one example of the portfolio theme colors being used on more than one page.**
+Every page in my app is a `Scaffold` with an `AppBar` at the top, the content in the body, and the same `LeftDrawer` on the side. Because the drawer is its own widget in `widgets/left_drawer.dart`, the home page, the project form and the experience form all show the exact same menu. So every page has the same layout and the user always knows where the title and the menu are. For the colors, the theme in `main.dart` uses indigo as the seed color. The AppBar on the home page and on the Add Experience form both use `Theme.of(context).colorScheme.primary`, so they get the same indigo. The drawer header and the Save button are indigo too.
+
+**3. Why was this layout chosen for the form? Explain what the spacing and scrolling widgets do when screen space is limited.**
+I put one field per row in a `Column`, so the form reads from top to bottom and still works on a narrow phone. Each field has a label, and some have a hint, so it's clear what to type. Every field is wrapped in `Padding` so there's space between them and they don't stick together. The whole form is inside a `SingleChildScrollView`, so when the screen is short or the keyboard covers part of it, the form scrolls instead of overflowing, and the Save button can always be reached. For the category I added `isExpanded: true` to the dropdown, because on a narrow screen the long option text was overflowing to the right.
+
+**4. What roles do `GlobalKey<FormState>`, `validator`, and `validate()` play when Save is pressed? Give one example of a value the form rejects and explain why choosing an input widget or keyboard type alone is insufficient.**
+The `GlobalKey<FormState>` is connected to the `Form`, so the Save button can reach the form's state. Each field has a `validator` that returns an error message if the input is wrong, or `null` if it's fine. When Save is pressed, `_formKey.currentState!.validate()` runs all the validators at once. If any of them returns a message, it shows in red under that field and the dialog doesn't open. Only when all of them return `null` does the dialog show up. One example is the thumbnail field: if I type `hello`, it's rejected because it isn't a link starting with `http://` or `https://`. The field uses `TextInputType.url`, but that only changes which keyboard shows up on a phone. You can still type or paste anything, so the validator is what actually checks it. Another example is a title with only spaces. It isn't empty, so only the `trim()` in the validator catches it.
+
+**AI Usage Disclosure:** I used Claude only to ask theory questions.
+
+- **Prompt Strategy:** While doing the tutorial and assignment, I asked Claude about concepts I was confused about, like how Navigator.push and pushReplacement differ, what GlobalKey<FormState> does, why validators return null. I didn't ask it to write my code. I used the answers to understand the material, then wrote the code and the README answers myself.
+- **Limitations & Manual Fixes:** The answers were general and not about my project, so I had to apply them to my own code myself. I tested everything in Chrome and ran flutter analyze myself, since the AI couldn't run my app.
+- **AI Chat Log:** https://claude.ai/share/c25fb73a-915c-486b-ad9f-f4e5255e4dfb
