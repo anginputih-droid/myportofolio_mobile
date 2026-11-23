@@ -15,17 +15,6 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
   String _experienceTitle = "";
   String _description = "";
 
-  InputDecoration _decoration(String label, {String? hint, Widget? suffix}) {
-    return InputDecoration(
-      labelText: label,
-      hintText: hint,
-      suffixIcon: suffix,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(5.0),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +24,7 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
       drawer: const LeftDrawer(),
@@ -51,9 +40,12 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
                   maxLength: 255,
-                  decoration: _decoration(
-                    "Title",
-                    hint: "Example: Backend Intern at Company X",
+                  decoration: InputDecoration(
+                    hintText: "Example: Backend Intern at Company X",
+                    labelText: "Title",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
                   ),
                   onChanged: (String? value) {
                     setState(() {
@@ -77,9 +69,12 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
                   maxLines: 5,
-                  decoration: _decoration(
-                    "Description",
-                    hint: "What did you do there?",
+                  decoration: InputDecoration(
+                    hintText: "What did you do there?",
+                    labelText: "Description",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
                   ),
                   onChanged: (String? value) {
                     setState(() {
@@ -105,7 +100,7 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
                   child: ElevatedButton(
                     style: ButtonStyle(
                       backgroundColor: WidgetStateProperty.all(
-                        Theme.of(context).colorScheme.primary,
+                        Colors.indigo,
                       ),
                     ),
                     onPressed: () {
@@ -127,7 +122,7 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
                               ),
                               actions: [
                                 TextButton(
-                                  child: const Text('Save'),
+                                  child: const Text('OK'),
                                   onPressed: () {
                                     Navigator.pop(context);
                                   },
