@@ -13,6 +13,7 @@ class MyHomePage extends StatelessWidget {
     ItemHomepage("View Projects", Icons.folder, const Color.fromARGB(255, 70, 187, 255)),
     ItemHomepage("View Experience", Icons.work, Colors.teal),
     ItemHomepage("Add Project", Icons.add_circle, Colors.green),
+    ItemHomepage("Add Experience", Icons.work_history, Colors.deepPurple),
     ItemHomepage("Logout", Icons.logout, Colors.redAccent),
   ];
 
