@@ -24,7 +24,7 @@ class _ProjectFormPageState extends State<ProjectFormPage> {
     'Data Science',
     'Other',
   ];
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,6 +99,7 @@ class _ProjectFormPageState extends State<ProjectFormPage> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: DropdownButtonFormField<String>(
+                  isExpanded: true,
                   decoration: InputDecoration(
                     labelText: "Project Category",
                     border: OutlineInputBorder(
