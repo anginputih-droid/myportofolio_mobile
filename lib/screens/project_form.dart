@@ -25,6 +25,18 @@ class _ProjectFormPageState extends State<ProjectFormPage> {
     'Other',
   ];
 
+   // Empties every field and puts the form back to how it started.
+  void _clearForm() {
+    _formKey.currentState!.reset();
+    setState(() {
+      _projectName = "";
+      _description = "";
+      _category = "Web Development";
+      _technologies = "";
+      _projectLink = "";
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -207,6 +219,15 @@ class _ProjectFormPageState extends State<ProjectFormPage> {
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
+                ),
+              ),
+              
+              // === Clear Button ===
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: TextButton(
+                  onPressed: _clearForm,
+                  child: const Text("Clear form"),
                 ),
               ),
             ],

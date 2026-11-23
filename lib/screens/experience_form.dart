@@ -33,6 +33,21 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
   final _startController = TextEditingController();
   final _endController = TextEditingController();
 
+    // Empties every field and puts the form back to how it started.
+  void _clearForm() {
+    _formKey.currentState!.reset();
+    _startController.clear();
+    _endController.clear();
+    setState(() {
+      _experienceTitle = "";
+      _description = "";
+      _category = "Full-Time";
+      _thumbnail = "";
+      _startDate = null;
+      _endDate = null;
+    });
+  }
+
   @override
   void dispose() {
     _startController.dispose();
@@ -310,6 +325,15 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
+                ),
+              ),
+              
+              // === Clear Button ===
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: TextButton(
+                  onPressed: _clearForm,
+                  child: const Text("Clear form"),
                 ),
               ),
             ],
