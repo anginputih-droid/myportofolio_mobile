@@ -16,6 +16,8 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
   String _description = "";
   String _category = "Full-Time"; // same default as the Django model
   String _thumbnail = "";
+  DateTime? _startDate;
+  DateTime? _endDate;
 
   // Same choices as EXPERIENCE_CHOICES in the Django Experience model.
   final List<String> _categories = [
@@ -26,6 +28,42 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
     'Full-Time',
     'Freelance',
   ];
+
+    // Shows the picked dates inside the date fields.
+  final _startController = TextEditingController();
+  final _endController = TextEditingController();
+
+  @override
+  void dispose() {
+    _startController.dispose();
+    _endController.dispose();
+    super.dispose();
+  }
+
+  String _formatDate(DateTime date) {
+    final month = date.month.toString().padLeft(2, '0');
+    final day = date.day.toString().padLeft(2, '0');
+    return '${date.year}-$month-$day';
+  }
+
+  Future<void> _pickDate({required bool isStart}) async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: (isStart ? _startDate : _endDate) ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (picked == null) return;
+    setState(() {
+      if (isStart) {
+        _startDate = picked;
+        _startController.text = _formatDate(picked);
+      } else {
+        _endDate = picked;
+        _endController.text = _formatDate(picked);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -160,8 +198,64 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
                 ),
               ),
 
-              // (date fields go here)
-              
+              // === Start Date ===
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: _startController,
+                  readOnly: true,
+                  decoration: InputDecoration(
+                    labelText: "Start Date",
+                    suffixIcon: const Icon(Icons.calendar_today),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                  ),
+                  onTap: () => _pickDate(isStart: true),
+                  validator: (String? value) {
+                    if (_startDate == null) {
+                      return "Pick a start date.";
+                    }
+                    return null;
+                  },
+                ),
+              ),
+
+              // === End Date (optional) ===
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: _endController,
+                  readOnly: true,
+                  decoration: InputDecoration(
+                    labelText: "End Date (leave empty if ongoing)",
+                    suffixIcon: _endDate == null
+                        ? const Icon(Icons.calendar_today)
+                        : IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              setState(() {
+                                _endDate = null;
+                                _endController.clear();
+                              });
+                            },
+                          ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                  ),
+                  onTap: () => _pickDate(isStart: false),
+                  validator: (String? value) {
+                    if (_endDate != null &&
+                        _startDate != null &&
+                        _endDate!.isBefore(_startDate!)) {
+                      return "End date can't be before the start date.";
+                    }
+                    return null;
+                  },
+                ),
+              ),
+
               // === Save Button ===
               Align(
                 alignment: Alignment.bottomCenter,
@@ -190,7 +284,10 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
                                     Text(
                                       'Thumbnail: ${_thumbnail.trim().isEmpty ? "-" : _thumbnail.trim()}',
                                     ),
-                                    // (date lines get added)
+                                    Text('Start Date: ${_formatDate(_startDate!)}'),
+                                    Text(
+                                      'End Date: ${_endDate == null ? "Ongoing" : _formatDate(_endDate!)}',
+                                    ),
                                   ],
                                 ),
                               ),

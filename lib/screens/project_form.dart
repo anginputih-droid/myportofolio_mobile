@@ -24,6 +24,7 @@ class _ProjectFormPageState extends State<ProjectFormPage> {
     'Data Science',
     'Other',
   ];
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
