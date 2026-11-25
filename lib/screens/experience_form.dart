@@ -8,7 +8,6 @@ class ExperienceFormPage extends StatefulWidget {
   State<ExperienceFormPage> createState() => _ExperienceFormPageState();
 }
 
-
 class _ExperienceFormPageState extends State<ExperienceFormPage> {
   final _formKey = GlobalKey<FormState>();
 
@@ -29,11 +28,11 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
     'Freelance',
   ];
 
-    // Shows the picked dates inside the date fields.
+  // Shows the picked dates inside the date fields.
   final _startController = TextEditingController();
   final _endController = TextEditingController();
 
-    // Empties every field and puts the form back to how it started.
+  // Empties every field and puts the form back to how it started.
   void _clearForm() {
     _formKey.currentState!.reset();
     _startController.clear();
@@ -168,10 +167,12 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
                   ),
                   initialValue: _category,
                   items: _categories
-                      .map((category) => DropdownMenuItem(
-                            value: category,
-                            child: Text(category),
-                          ))
+                      .map(
+                        (category) => DropdownMenuItem(
+                          value: category,
+                          child: Text(category),
+                        ),
+                      )
                       .toList(),
                   onChanged: (String? newValue) {
                     setState(() {
@@ -203,7 +204,8 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
                       return null; // optional, like blank=True in Django
                     }
                     final uri = Uri.tryParse(value.trim());
-                    final isValid = uri != null &&
+                    final isValid =
+                        uri != null &&
                         (uri.scheme == 'http' || uri.scheme == 'https') &&
                         uri.host.isNotEmpty;
                     if (!isValid) {
@@ -279,9 +281,7 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(
-                        Colors.indigo,
-                      ),
+                      backgroundColor: WidgetStateProperty.all(Colors.indigo),
                     ),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
@@ -300,7 +300,9 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
                                     Text(
                                       'Thumbnail: ${_thumbnail.trim().isEmpty ? "-" : _thumbnail.trim()}',
                                     ),
-                                    Text('Start Date: ${_formatDate(_startDate!)}'),
+                                    Text(
+                                      'Start Date: ${_formatDate(_startDate!)}',
+                                    ),
                                     Text(
                                       'End Date: ${_endDate == null ? "Ongoing" : _formatDate(_endDate!)}',
                                     ),
@@ -327,7 +329,7 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
                   ),
                 ),
               ),
-              
+
               // === Clear Button ===
               Align(
                 alignment: Alignment.bottomCenter,

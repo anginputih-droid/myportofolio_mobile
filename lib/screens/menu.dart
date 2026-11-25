@@ -10,7 +10,11 @@ class MyHomePage extends StatelessWidget {
   final String kelas = "KKI";
 
   final List<ItemHomepage> items = [
-    ItemHomepage("View Projects", Icons.folder, const Color.fromARGB(255, 70, 187, 255)),
+    ItemHomepage(
+      "View Projects",
+      Icons.folder,
+      const Color.fromARGB(255, 70, 187, 255),
+    ),
     ItemHomepage("View Experience", Icons.work, Colors.teal),
     ItemHomepage("Add Project", Icons.add_circle, Colors.green),
     ItemHomepage("Add Experience", Icons.work_history, Colors.deepPurple),
@@ -23,17 +27,14 @@ class MyHomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'MyPortfolio',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
-        iconTheme: const IconThemeData(color: Colors.white)
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       drawer: const LeftDrawer(),
       body: SingleChildScrollView(
-          child: Padding(
+        child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -42,9 +43,15 @@ class MyHomePage extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Expanded(child: InfoCard(title: 'NPM', content: npm)),
-                  Expanded(child: InfoCard(title: 'Name', content: nama)),
-                  Expanded(child: InfoCard(title: 'Class', content: kelas)),
+                  Expanded(
+                    child: InfoCard(title: 'NPM', content: npm),
+                  ),
+                  Expanded(
+                    child: InfoCard(title: 'Name', content: nama),
+                  ),
+                  Expanded(
+                    child: InfoCard(title: 'Class', content: kelas),
+                  ),
                 ],
               ),
 
@@ -87,7 +94,6 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
-
 class InfoCard extends StatelessWidget {
   // Information card displaying a title and its associated content.
   final String title;
@@ -103,10 +109,7 @@ class InfoCard extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Text(
-              title,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
+            Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8.0),
             Text(content),
           ],
@@ -115,7 +118,6 @@ class InfoCard extends StatelessWidget {
     );
   }
 }
-
 
 class ItemHomepage {
   final String name;

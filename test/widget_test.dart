@@ -1,30 +1,56 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:myportofolio_mobile/main.dart';
+import 'package:myportofolio_mobile/models/project.dart';
+import 'package:myportofolio_mobile/services/api_client.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  test('Project reads snake_case JSON and leaves id out of toJson', () {
+    final project = Project.fromJson({
+      'id': 'abc',
+      'title': 'Weather App',
+      'description': 'Shows the weather',
+      'tech_stack': 'Flutter',
+      'project_url': 'https://example.com',
+      'thumbnail': null,
+    });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(project.techStack, 'Flutter');
+    expect(project.thumbnail, '');
+    expect(project.toJson().containsKey('id'), isFalse);
+    expect(project.toJson()['tech_stack'], 'Flutter');
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  test(
+    'ApiClient.getProjects turns the JSON list into Project objects',
+    () async {
+      final client = MockClient((request) async {
+        return http.Response(
+          jsonEncode([
+            {
+              'id': '1',
+              'title': 'Weather App',
+              'description': 'd',
+              'tech_stack': 'Flutter',
+              'project_url': 'https://example.com',
+              'thumbnail': '',
+            },
+          ]),
+          200,
+        );
+      });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+      final projects = await ApiClient(client: client).getProjects();
+      expect(projects.single.title, 'Weather App');
+    },
+  );
+
+  testWidgets('Home page shows the menu buttons', (WidgetTester tester) async {
+    await tester.pumpWidget(MyApp(apiClient: ApiClient()));
+    expect(find.text('View Projects'), findsOneWidget);
+    expect(find.text('Add Project'), findsOneWidget);
   });
 }
