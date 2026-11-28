@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:myportofolio_mobile/screens/project_form.dart';
 import 'package:myportofolio_mobile/screens/experience_form.dart';
+import 'package:myportofolio_mobile/screens/experience_list_screen.dart';
 import 'package:myportofolio_mobile/screens/menu.dart';
 import 'package:myportofolio_mobile/screens/project_list_screen.dart';
 import 'package:myportofolio_mobile/services/auth_state.dart';
@@ -61,13 +62,32 @@ class ItemCard extends StatelessWidget {
                   backgroundColor: item.color,
                 ),
               );
-          } else if (item.name == "Add Experience") {
+          } else if (item.name == "View Experience") {
             Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ExperienceListScreen(),
+              ),
+            );
+          } else if (item.name == "Add Experience") {
+            // Same as Add Project: log in first if needed.
+            final loggedIn = await ensureLoggedIn(context);
+            if (!loggedIn || !context.mounted) return;
+            final saved = await Navigator.push<bool>(
               context,
               MaterialPageRoute(
                 builder: (context) => const ExperienceFormPage(),
               ),
             );
+            // "See list" in the success dialog sends back true.
+            if (saved == true && context.mounted) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ExperienceListScreen(),
+                ),
+              );
+            }
           }
         },
         child: Container(

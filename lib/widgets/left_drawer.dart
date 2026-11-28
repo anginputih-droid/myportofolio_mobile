@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:myportofolio_mobile/screens/menu.dart';
 import 'package:myportofolio_mobile/screens/project_form.dart';
 import 'package:myportofolio_mobile/screens/experience_form.dart';
+import 'package:myportofolio_mobile/screens/experience_list_screen.dart';
 import 'package:myportofolio_mobile/screens/login_screen.dart';
 import 'package:myportofolio_mobile/screens/project_list_screen.dart';
 import 'package:myportofolio_mobile/services/auth_state.dart';
@@ -87,15 +88,38 @@ class LeftDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.work_outline),
-            title: const Text('Add Experience'),
-            // Navigate to the Add Experience screen
+            title: const Text('View Experience'),
             onTap: () {
               Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ExperienceListScreen(),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.work_history_outlined),
+            title: const Text('Add Experience'),
+            // Log in first if needed, then open the Add Experience screen
+            onTap: () async {
+              final loggedIn = await ensureLoggedIn(context);
+              if (!loggedIn || !context.mounted) return;
+              final saved = await Navigator.push<bool>(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const ExperienceFormPage(),
                 ),
               );
+              // "See list" in the success dialog sends back true.
+              if (saved == true && context.mounted) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ExperienceListScreen(),
+                  ),
+                );
+              }
             },
           ),
           if (!isLoggedIn)
