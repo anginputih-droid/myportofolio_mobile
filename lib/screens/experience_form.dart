@@ -1,5 +1,10 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:myportofolio_mobile/models/experience.dart';
+import 'package:myportofolio_mobile/services/api_client.dart';
+import 'package:myportofolio_mobile/services/auth_state.dart';
+import 'package:myportofolio_mobile/widgets/auth_guard.dart';
 import 'package:myportofolio_mobile/widgets/left_drawer.dart';
+import 'package:provider/provider.dart';
 
 class ExperienceFormPage extends StatefulWidget {
   const ExperienceFormPage({super.key});
@@ -13,20 +18,21 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
 
   String _experienceTitle = "";
   String _description = "";
-  String _category = "Full-Time"; // same default as the Django model
+  String _category = "full-time"; // same default as the Django model
   String _thumbnail = "";
   DateTime? _startDate;
   DateTime? _endDate;
+  bool _isSubmitting = false;
 
   // Same choices as EXPERIENCE_CHOICES in the Django Experience model.
-  final List<String> _categories = [
-    'Internship',
-    'Research',
-    'Volunteer',
-    'Part-Time',
-    'Full-Time',
-    'Freelance',
-  ];
+  final Map<String, String> _categories = {
+    'internship': 'Internship',
+    'research': 'Research',
+    'volunteer': 'Volunteer',
+    'part-time': 'Part-Time',
+    'full-time': 'Full-Time',
+    'freelance': 'Freelance',
+  };
 
   // Shows the picked dates inside the date fields.
   final _startController = TextEditingController();
@@ -54,12 +60,6 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
     super.dispose();
   }
 
-  String _formatDate(DateTime date) {
-    final month = date.month.toString().padLeft(2, '0');
-    final day = date.day.toString().padLeft(2, '0');
-    return '${date.year}-$month-$day';
-  }
-
   Future<void> _pickDate({required bool isStart}) async {
     final picked = await showDatePicker(
       context: context,
@@ -71,12 +71,111 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
     setState(() {
       if (isStart) {
         _startDate = picked;
-        _startController.text = _formatDate(picked);
+        _startController.text = formatDate(picked);
       } else {
         _endDate = picked;
-        _endController.text = _formatDate(picked);
+        _endController.text = formatDate(picked);
       }
     });
+  }
+
+  // A picked date has no time zone, so save it as midnight UTC on that day.
+  DateTime _toUtc(DateTime date) =>
+      DateTime.utc(date.year, date.month, date.day);
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    // Make sure we have a token before sending the POST request.
+    final loggedIn = await ensureLoggedIn(context);
+    if (!loggedIn || !mounted) return;
+
+    final auth = context.read<AuthState>();
+    final apiClient = context.read<ApiClient>();
+    final newExperience = Experience(
+      title: _experienceTitle.trim(),
+      description: _description.trim(),
+      category: _category,
+      thumbnail: _thumbnail.trim(),
+      startedAt: _toUtc(_startDate!),
+      endedAt: _endDate == null ? null : _toUtc(_endDate!),
+    );
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      final saved = await apiClient.createExperience(
+        newExperience,
+        token: auth.token!,
+      );
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder: (dialogContext) {
+          return AlertDialog(
+            title: const Text('Experience added successfully!'),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Title: ${saved.title}'),
+                  Text('Description: ${saved.description}'),
+                  Text('Category: ${saved.categoryDisplay}'),
+                  Text(
+                    'Thumbnail: ${saved.thumbnail.isEmpty ? "-" : saved.thumbnail}',
+                  ),
+                  Text('Period: ${saved.period}'),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                child: const Text('Add another'),
+                onPressed: () {
+                  Navigator.pop(dialogContext);
+                  _clearForm();
+                },
+              ),
+              TextButton(
+                child: const Text('See list'),
+                onPressed: () {
+                  Navigator.pop(dialogContext);
+                  // true tells the screen before this one that we saved something.
+                  Navigator.pop(context, true);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      if (e.statusCode == 401) {
+        // The token is no longer valid: log out and ask to log in again.
+        await auth.logout();
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Your session ended. Please log in again.'),
+          ),
+        );
+        await ensureLoggedIn(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Could not save the experience (${e.statusCode}).'),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
   }
 
   @override
@@ -166,11 +265,11 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
                     ),
                   ),
                   initialValue: _category,
-                  items: _categories
+                  items: _categories.entries
                       .map(
                         (category) => DropdownMenuItem(
-                          value: category,
-                          child: Text(category),
+                          value: category.key,
+                          child: Text(category.value),
                         ),
                       )
                       .toList(),
@@ -283,49 +382,17 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
                     style: ButtonStyle(
                       backgroundColor: WidgetStateProperty.all(Colors.indigo),
                     ),
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text('Experience saved!'),
-                              content: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Title: ${_experienceTitle.trim()}'),
-                                    Text('Description: ${_description.trim()}'),
-                                    Text('Category: $_category'),
-                                    Text(
-                                      'Thumbnail: ${_thumbnail.trim().isEmpty ? "-" : _thumbnail.trim()}',
-                                    ),
-                                    Text(
-                                      'Start Date: ${_formatDate(_startDate!)}',
-                                    ),
-                                    Text(
-                                      'End Date: ${_endDate == null ? "Ongoing" : _formatDate(_endDate!)}',
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  child: const Text('OK'),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      }
-                    },
-                    child: const Text(
-                      "Save",
-                      style: TextStyle(color: Colors.white),
-                    ),
+                    onPressed: _isSubmitting ? null : _submit,
+                    child: _isSubmitting
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text(
+                            "Save",
+                            style: TextStyle(color: Colors.white),
+                          ),
                   ),
                 ),
               ),
