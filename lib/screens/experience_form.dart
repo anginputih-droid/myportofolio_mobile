@@ -46,7 +46,7 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
     setState(() {
       _experienceTitle = "";
       _description = "";
-      _category = "Full-Time";
+      _category = "full-time";
       _thumbnail = "";
       _startDate = null;
       _endDate = null;

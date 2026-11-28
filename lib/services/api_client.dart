@@ -89,7 +89,7 @@ class ApiClient {
     final decoded = jsonDecode(response.body) as Map<String, dynamic>;
     return Experience.fromJson(decoded);
   }
-  
+
   Future<String> obtainToken(String username, String password) async {
     final response = await _client.post(
       _uri('/api/v1/auth/token/'),
